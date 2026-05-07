@@ -10,61 +10,53 @@
 | Linux | [Data2Las-Linux](https://github.com/appsbyai/data2las/releases/latest/download/Data2Las-Linux) |
 | macOS | [Data2Las-macOS](https://github.com/appsbyai/data2las/releases/latest/download/Data2Las-macOS) |
 
-[All releases →](https://github.com/appsbyai/data2las/releases)
-
 ## Quick start
 
-1. Download the file for your platform
-2. **Windows:** Double-click `Data2Las-Windows.exe`
+1. Download for your platform
+2. **Windows:** Double-click the `.exe`
 3. **Linux:** `chmod +x Data2Las-Linux && ./Data2Las-Linux`
-4. **macOS:** Right-click → Open (first time, to bypass Gatekeeper)
+4. **macOS:** Right-click → Open (first time)
 5. Drag your folder with `ROCK-*.data` files onto the window
 6. Click **Process to LAS**
-7. Open the result in [CloudCompare](https://cloudcompare.org)
 
-## Getting better accuracy with PPK
+## Centimeter accuracy with PPK
 
-By default, Data2Las uses the built-in GPS positions from the uBlox receiver (~0.2m accuracy). For centimeter-level accuracy, add your base station RINEX files to the same folder:
+By default, accuracy is ~0.2m (standalone GPS). For centimeter-level accuracy, add your base station RINEX files to the same folder as your `.data` files:
 
 ```
 my_flight/
-  ROCK-2026-05-05-23-36-13-001.data   ← your .data file(s)
-  base_202605050011.obs                ← base station observation file
-  base_202605050011.nav                ← base station navigation file (optional)
+  ROCK-2026-05-05-23-36-13-001.data
+  base_station.obs               ← observation file
+  base_station.nav               ← navigation file (optional)
 ```
 
-When Data2Las finds base station files with time overlap, it automatically switches to PPK mode.
+Data2Las auto-detects these and uses PPK if RTKLIB is installed:
 
-### Installing RTKLIB (required for PPK)
-
-| Platform | Command |
-|----------|---------|
+| Platform | Install RTKLIB |
+|----------|---------------|
 | Linux | `sudo apt install rtklib` |
-| macOS | `brew install rtklib` |
-| Windows | Download [RTKLIB demo5](https://github.com/rtklibexplorer/RTKLIB/releases) and add to PATH |
+| macOS | Download [RTKLIB demo5](https://github.com/rtklibexplorer/RTKLIB/releases) binary |
+| Windows | Download [RTKLIB demo5 binaries](https://github.com/rtklibexplorer/RTKLIB/releases) |
 
-If RTKLIB isn't installed, Data2Las will still work — it just falls back to standalone GPS accuracy.
+Without RTKLIB, Data2Las still works — just at standalone GPS accuracy (~0.2m).
 
-## Features
-
-- **No dependencies** — single file, no Python/pip needed
-- **No license** — MIT open source, free for everything  
-- **No login** — works offline, no cloud upload
-- **PPK support** — centimeter accuracy with base station RINEX + RTKLIB
-- **3D preview** — XY/XZ/YZ projections with intensity coloring
-- **Photo extraction** — pull JPEG images from the .data container
-- **Configurable** — range filters, lever arm calibration, boresight angles
-
-## For Python users (CLI or latest dev version)
+## For Python users
 
 ```bash
 pip install "data2las[gui] @ git+https://github.com/appsbyai/data2las.git"
-data2las ./my_flight_data/
-data2las-gui
+data2las-gui          # desktop app
+data2las ./my_data/   # command line
 ```
 
-## Supported hardware
+## Features
 
-Rock Robotic R2A (fw 4.2.0.0 tested) • Livox Avia LiDAR • uBlox ZED-F9P GNSS • Emlid Reach RS2 base stations
+- Zero dependencies (standalone executables)
+- PPK support for centimeter accuracy
+- 3D point cloud preview
+- JPEG photo extraction
+- Configurable range filters and calibration
+- MIT license — free for everything
 
-Works on Windows, macOS, Linux.
+## Hardware
+
+Rock Robotic R2A • Livox Avia • uBlox ZED-F9P • Emlid Reach base stations

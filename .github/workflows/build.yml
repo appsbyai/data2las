@@ -17,9 +17,10 @@ jobs:
           python-version: '3.12'
       - run: pip install -e ".[gui]" && pip install pyinstaller
       - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
+      - run: ren dist\Data2Las.exe Data2Las-Windows.exe
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/Data2Las.exe
+          files: dist/Data2Las-Windows.exe
 
   linux:
     runs-on: ubuntu-latest
@@ -31,9 +32,10 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libopengl0
       - run: pip install -e ".[gui]" && pip install pyinstaller
       - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
+      - run: mv dist/Data2Las dist/Data2Las-Linux
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/Data2Las
+          files: dist/Data2Las-Linux
 
   macos:
     runs-on: macos-latest
@@ -44,6 +46,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -e ".[gui]" && pip install pyinstaller
       - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
+      - run: mv dist/Data2Las dist/Data2Las-macOS
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/Data2Las
+          files: dist/Data2Las-macOS

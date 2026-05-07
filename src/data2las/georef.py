@@ -46,7 +46,7 @@ def rotation_matrix(yaw, pitch, roll):
 
 def georeference_points(points, total_records, gnss_data,
                         lever_arm, boresight_deg, mount_yaw,
-                        on_progress=None):
+                        on_progress=None, epsg_override=None):
     """Transform all LiDAR points to UTM coordinates.
 
     Returns: x, y, z, intensity, gps_time, epsg_code
@@ -55,7 +55,7 @@ def georeference_points(points, total_records, gnss_data,
 
     times, lats, lons, hgts = trajectory_arrays(gnss_data)
 
-    epsg = compute_epsg(lats, lons)
+    epsg = epsg_override if epsg_override else compute_epsg(lats, lons)
     to_ecef, to_enu, ref_ecef = build_transforms(lats[0], lons[0])
 
     i_lat = interp1d(times, lats, kind="linear", fill_value="extrapolate")

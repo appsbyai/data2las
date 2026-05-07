@@ -7,7 +7,7 @@ import numpy as np
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QProgressBar, QTextEdit, QFileDialog,
-    QGroupBox, QLineEdit, QDoubleSpinBox, QFormLayout,
+    QGroupBox, QLineEdit, QDoubleSpinBox, QComboBox, QFormLayout,
     QMessageBox, QDialog,
 )
 from PySide6.QtCore import Qt, QSettings
@@ -16,6 +16,7 @@ from PySide6.QtGui import QAction, QColor, QPalette, QFont
 from data2las.engine import Pipeline
 from data2las import utils
 from data2las.ppk import find_base_rinex
+from data2las.crs_utils import COMMON_CRS
 from data2las.gui.worker import ProcessWorker
 from data2las.gui.preview import PointCloudPreview
 from data2las.gui.settings import SettingsDialog
@@ -104,6 +105,13 @@ class MainWindow(QMainWindow):
         bo.clicked.connect(self._browse_output)
         oh.addWidget(bo)
         ogl.addLayout(oh)
+        crs_h = QHBoxLayout()
+        crs_h.addWidget(QLabel("Projection:"))
+        self._crs_combo = QComboBox()
+        self._crs_combo.addItems(COMMON_CRS.keys())
+        self._crs_combo.setCurrentText("Auto UTM (WGS84)")
+        crs_h.addWidget(self._crs_combo, 1)
+        ogl.addLayout(crs_h)
         ll.addWidget(og)
 
         # Filters
@@ -154,6 +162,9 @@ class MainWindow(QMainWindow):
         self._btn_photos = QPushButton("Extract Photos"); self._btn_photos.setEnabled(False)
         self._btn_photos.clicked.connect(self._extract_photos)
         rh.addWidget(self._btn_photos)
+        self._btn_geo_photos = QPushButton("Geotag Photos"); self._btn_geo_photos.setEnabled(False)
+        self._btn_geo_photos.clicked.connect(self._geotag_photos)
+        rh.addWidget(self._btn_geo_photos)
         rgl.addLayout(rh)
         ll.addWidget(rg)
         ll.addStretch()
@@ -285,8 +296,12 @@ class MainWindow(QMainWindow):
         self._pbar.setVisible(True); self._pbar.setValue(0)
         self._rtext.clear()
 
+        # Get selected CRS
+        crs_name = self._crs_combo.currentText()
+        epsg = COMMON_CRS.get(crs_name)  # None for auto-UTM
+
         self.worker = ProcessWorker(self.input_dir, out, self.rng_min, self.rng_max,
-                                    self.la, self.bs, self.my)
+                                    self.la, self.bs, self.my, epsg)
         self.worker.progress_signal.connect(self._on_progress)
         self.worker.log_signal.connect(self._on_log)
         self.worker.done_signal.connect(self._on_done)
@@ -335,6 +350,29 @@ class MainWindow(QMainWindow):
         n = extract_photos(dfs, out)
         QMessageBox.information(self, "Photos Extracted",
                                 f"{n} JPEG images written to:\n{out}")
+        self._btn_geo_photos.setEnabled(n > 0)
+
+    def _geotag_photos(self):
+        if not self.input_dir:
+            return
+        photo_dir = os.path.join(self.input_dir, "extracted_photos")
+        if not os.path.isdir(photo_dir):
+            QMessageBox.warning(self, "No Photos", "Extract photos first.")
+            return
+
+        dfs = sorted(globmod.glob(os.path.join(self.input_dir, "ROCK-*.data")))
+        from data2las.gnss import extract_gnss
+        from data2las.exif_writer import georeference_photos
+
+        gnss = extract_gnss(dfs)
+        if not gnss:
+            QMessageBox.warning(self, "No GNSS", "No GNSS data available for geotagging.")
+            return
+
+        out = os.path.join(self.input_dir, "geotagged_photos")
+        n = georeference_photos(photo_dir, gnss, out)
+        QMessageBox.information(self, "Photos Geotagged",
+                                f"{n} photos geotagged and written to:\n{out}")
 
 
 def launch_gui():

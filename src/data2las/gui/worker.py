@@ -13,10 +13,10 @@ class ProcessWorker(QThread):
     error_signal = Signal(str)
 
     def __init__(self, input_dir, output_path, min_range, max_range,
-                 lever_arm, boresight, mount_yaw):
+                 lever_arm, boresight, mount_yaw, epsg=None):
         super().__init__()
         self.args = (input_dir, output_path, min_range, max_range,
-                     lever_arm, boresight, mount_yaw)
+                     lever_arm, boresight, mount_yaw, False, epsg)
 
     def run(self):
         try:

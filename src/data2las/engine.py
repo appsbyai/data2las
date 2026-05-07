@@ -10,6 +10,7 @@ from .georef import georeference_points
 from .las_writer import write_las, get_stats
 from .calibration import read_from_pcpp, DEFAULT_LEVER_ARM, DEFAULT_BORESIGHT, DEFAULT_MOUNT_YAW
 from .ppk import find_base_rinex, check_time_overlap, extract_rover_rinex, run_ppk, parse_pos_file
+from .crs_utils import auto_utm, COMMON_CRS
 
 
 class Pipeline:
@@ -26,7 +27,8 @@ class Pipeline:
         self.on_progress(pct, msg)
 
     def run(self, input_dir, output_path, min_range=1.0, max_range=200.0,
-            lever_arm=None, boresight=None, mount_yaw=None, compress=False):
+            lever_arm=None, boresight=None, mount_yaw=None, compress=False,
+            epsg=None):
         """Execute the complete .data → LAS pipeline."""
         # Phase 1: Discover
         self.progress(0, "Discovering files...")
@@ -145,7 +147,8 @@ class Pipeline:
         self.progress(40, "Georeferencing...")
         lx, ly, lz, li, lt, epsg = georeference_points(
             pts, total, gnss, lever_arm, boresight, mount_yaw,
-            on_progress=lambda pct, msg: self.progress(pct, msg))
+            on_progress=lambda pct, msg: self.progress(pct, msg),
+            epsg_override=epsg)
 
         # Phase 6: Write
         self.progress(90, "Writing LAS...")

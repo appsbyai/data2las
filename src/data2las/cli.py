@@ -39,7 +39,7 @@ def main():
     print()
 
     pipeline = Pipeline(
-        on_progress=lambda p, m: print(f"  [{p:3d}%] {m}"),
+        on_progress=lambda p, m: print(f"  [{int(p):3d}%] {m}"),
         on_log=lambda m: print(f"  {m}"))
 
     try:

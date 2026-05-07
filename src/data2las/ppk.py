@@ -259,15 +259,8 @@ def _extract_ubx_raw(data_files, output_path):
                                         ca == data[i + 6 + length]
                                         and cb == data[i + 7 + length]
                                     ):
-                                        # Write valid UBX message with sync + class/id + length + payload + checksum
-                                        msg = (
-                                            data[i : i + 2]
-                                            + data[i + 2 : i + 6]
-                                            + struct.pack("<H", length)
-                                            + data[i + 6 : i + 6 + length]
-                                            + data[i + 6 + length : i + 8 + length]
-                                        )
-                                        out.write(msg)
+                                        # Write raw UBX message: sync(2) + class/id/length(4) + payload + checksum(2)
+                                        out.write(data[i : i + 8 + length])
                                         count += 1
                                     i += 8 + length
                                     continue

@@ -3,7 +3,7 @@
 from PySide6.QtCore import QThread, Signal
 import numpy as np
 
-from rock2las.engine import Pipeline
+from data2las.engine import Pipeline
 
 
 class ProcessWorker(QThread):

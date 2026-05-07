@@ -1,5 +1,5 @@
 [project]
-name = "rock2las"
+name = "data2las"
 version = "1.0.0"
 description = "Convert Rock Robotic R2A .data files to georeferenced LAS point clouds"
 readme = "README.md"
@@ -18,8 +18,8 @@ gui = ["PySide6>=6.5"]
 laz = ["lazrs>=0.5"]
 
 [project.scripts]
-rock2las = "rock2las.cli:main"
-rock2las-gui = "rock2las.gui.app:launch_gui"
+data2las = "data2las.cli:main"
+data2las-gui = "data2las.gui.app:launch_gui"
 
 [tool.setuptools.packages.find]
 where = ["src"]

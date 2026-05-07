@@ -13,8 +13,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QSettings
 from PySide6.QtGui import QAction, QColor, QPalette, QFont
 
-from rock2las.engine import Pipeline
-from rock2las import utils
+from data2las.engine import Pipeline
+from data2las import utils
 from .worker import ProcessWorker
 from .preview import PointCloudPreview
 from .settings import SettingsDialog
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         self.worker = None
 
         # Restore settings
-        self.settings = QSettings("rock2las", "desktop")
+        self.settings = QSettings("data2las", "desktop")
         self.rng_min = float(self.settings.value("range/min", 1.0))
         self.rng_max = float(self.settings.value("range/max", 200.0))
         self.la = np.array([
@@ -263,7 +263,7 @@ class MainWindow(QMainWindow):
             "Rock2Las Desktop v1.0\n\n"
             "Converts Rock Robotic R2A .data files to georeferenced LAS point clouds.\n\n"
             "Open source (MIT) — no license, no login, no cloud dependency.\n"
-            "github.com/your-org/rock2las")
+            "github.com/your-org/data2las")
 
     def _process(self):
         if not self.input_dir:
@@ -322,14 +322,14 @@ class MainWindow(QMainWindow):
             return
         out = os.path.join(self.input_dir, "extracted_photos")
         dfs = sorted(globmod.glob(os.path.join(self.input_dir, "ROCK-*.data")))
-        from rock2las.camera import extract_photos
+        from data2las.camera import extract_photos
         n = extract_photos(dfs, out)
         QMessageBox.information(self, "Photos Extracted",
                                 f"{n} JPEG images written to:\n{out}")
 
 
 def launch_gui():
-    """Entry point for rock2las-gui command."""
+    """Entry point for data2las-gui command."""
     app = QApplication(sys.argv)
     app.setApplicationName("Rock2Las Desktop")
     app.setStyle("Fusion")

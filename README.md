@@ -1,4 +1,4 @@
-# Rock2Las
+# Data2Las
 
 **One command to convert Rock Robotic R2A `.data` → `.las` point cloud.**
 
@@ -7,21 +7,21 @@ No license key. No login. No cloud. Works on Windows, macOS, Linux.
 ## Install (copy-paste this)
 
 ```bash
-pip install "rock2las[gui] @ git+https://github.com/appsbyai/rock2las.git"
+pip install "data2las[gui] @ git+https://github.com/appsbyai/data2las.git"
 ```
 
 ## Use
 
 **Desktop app** (drag & drop, preview, export):
 ```bash
-rock2las-gui
+data2las-gui
 ```
 
 **Command line:**
 ```bash
-rock2las ./my_flight_data/
-rock2las . -o cloud.las --min-range 2 --max-range 150
-rock2las . --extract-photos
+data2las ./my_flight_data/
+data2las . -o cloud.las --min-range 2 --max-range 150
+data2las . --extract-photos
 ```
 
 ## What it does
@@ -53,5 +53,5 @@ Rock Desktop requires a paid processing license. This tool is MIT-licensed open 
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name Rock2Las src/rock2las/gui/app.py
+pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
 ```

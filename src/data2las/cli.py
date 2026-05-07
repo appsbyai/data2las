@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""CLI entry point for rock2las."""
+"""CLI entry point for data2las."""
 
 import sys, os, argparse, glob as globmod
 import numpy as np
 
-from rock2las.engine import Pipeline
-from rock2las.camera import extract_photos
+from data2las.engine import Pipeline
+from data2las.camera import extract_photos
 
 
 def main():
@@ -33,7 +33,7 @@ def main():
     else:
         output = args.output
 
-    print("rock2las v1.0.0")
+    print("data2las v1.0.0")
     print(f"Processing: {workdir}")
     print(f"Output:     {output}")
     print()

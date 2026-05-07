@@ -1,52 +1,57 @@
 # Rock2Las
 
-Convert Rock Robotic R2A `.data` files to georeferenced LAS/LAZ point clouds.
+**One command to convert Rock Robotic R2A `.data` → `.las` point cloud.**
 
-**No license key required. No login. No cloud dependency.**
+No license key. No login. No cloud. Works on Windows, macOS, Linux.
 
-## Quick Start
+## Install (copy-paste this)
 
 ```bash
-pip install rock2las[gui]
-rock2las-gui          # Desktop app (Windows/Linux/macOS)
-rock2las ./my_data/   # CLI
+pip install "rock2las[gui] @ git+https://github.com/appsbyai/rock2las.git"
 ```
 
-## GUI
+## Use
 
-Drag a folder containing `ROCK-*.data` files onto the window and click **Process to LAS**. The app auto-detects calibration from `.pcpp` project files and writes a georeferenced LAS 1.4 file with GPS time and intensity.
-
-Features:
-- Drag-and-drop .data files
-- Configurable range filters and calibration (lever arm, boresight)
-- Built-in 3D point cloud preview (XY/XZ/YZ projections)
-- JPEG photo extraction from the .data container
-- Settings persistence between sessions
-
-## CLI
-
+**Desktop app** (drag & drop, preview, export):
 ```bash
-rock2las /path/to/data
-rock2las . -o output.las --min-range 2.0 --max-range 150.0
+rock2las-gui
+```
+
+**Command line:**
+```bash
+rock2las ./my_flight_data/
+rock2las . -o cloud.las --min-range 2 --max-range 150
 rock2las . --extract-photos
 ```
 
-## Supported Hardware
+## What it does
 
-- **Sensor:** Rock Robotic R2A
-- **LiDAR:** Livox Avia (Mid-40/100 untested)
-- **GNSS:** uBlox ZED-F9P (standalone ~0.2m, PPK if base RINEX available)
-- **Firmware:** 4.2.0.0 tested (other versions may work)
+Drag a folder with `ROCK-*.data` files → click **Process** → get a georeferenced LAS 1.4 file:
 
-## Build Standalone Executable
+- Extracts GNSS trajectory from uBlox ZED-F9P (standalone or PPK)
+- Decodes Livox Avia LiDAR points (240k pts/sec)
+- Applies boresight + lever arm calibration
+- Outputs UTM-projected LAS with GPS time + intensity
+- Extracts JPEG photos from the camera channel
+- Built-in 3D preview (XY/XZ/YZ projections)
+
+## Supported hardware
+
+| Component | Tested |
+|-----------|--------|
+| ROCK R2A (fw 4.2.0.0) | Yes |
+| Livox Avia | Yes |
+| uBlox ZED-F9P | Yes |
+| Livox Mid-40/100 | Untested |
+| Older firmware versions | Likely works |
+
+## Why
+
+Rock Desktop requires a paid processing license. This tool is MIT-licensed open source — use it anywhere, modify it, share it.
+
+## Build standalone .exe (Windows)
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name Rock2Las gui/app.py
+pyinstaller --onefile --windowed --name Rock2Las src/rock2las/gui/app.py
 ```
-
-Outputs `dist/Rock2Las.exe` (or `.app` on macOS).
-
-## License
-
-MIT — free for commercial and personal use.

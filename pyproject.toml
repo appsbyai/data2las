@@ -1,0 +1,25 @@
+[project]
+name = "rock2las"
+version = "1.0.0"
+description = "Convert Rock Robotic R2A .data files to georeferenced LAS point clouds"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+
+dependencies = [
+    "numpy>=1.21",
+    "scipy>=1.7",
+    "laspy>=2.5",
+    "pyproj>=3.3",
+]
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.5"]
+laz = ["lazrs>=0.5"]
+
+[project.scripts]
+rock2las = "rock2las.cli:main"
+rock2las-gui = "rock2las.gui.app:launch_gui"
+
+[tool.setuptools.packages.find]
+where = ["src"]

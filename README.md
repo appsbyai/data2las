@@ -1,57 +1,59 @@
 # Data2Las
 
-**One command to convert Rock Robotic R2A `.data` → `.las` point cloud.**
+**Double-click → .data → .las** — no Python, no terminal, no license key.
 
-No license key. No login. No cloud. Works on Windows, macOS, Linux.
+[⬇ Download Data2Las.exe](https://github.com/appsbyai/data2las/releases/latest)
 
-## Install (copy-paste this)
+## How to use
+
+1. Download `Data2Las.exe` from the link above
+2. Double-click it
+3. Drag your folder with `ROCK-*.data` files onto the window
+4. Click **Process to LAS**
+5. Open the result in [CloudCompare](https://cloudcompare.org)
+
+## Screenshot
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Data2Las Desktop                                     │
+│  ┌──────────────────────┐  ┌──────────────────────┐  │
+│  │ 1. Input             │  │                      │  │
+│  │  [drag files here]   │  │   ┌──────────────┐   │  │
+│  │  [Browse Folder]     │  │   │ 3D Preview   │   │  │
+│  │                      │  │   │ (XY, XZ, YZ)  │   │  │
+│  │ 2. Output            │  │   └──────────────┘   │  │
+│  │  [output path    ]   │  │                      │  │
+│  │                      │  │                      │  │
+│  │ 3. Filters           │  │                      │  │
+│  │  Min range: [1.0] m  │  │                      │  │
+│  │  Max range: [200] m  │  │                      │  │
+│  │                      │  │                      │  │
+│  │ [Process to LAS]     │  │                      │  │
+│  │ [████████░░░] 67%    │  │                      │  │
+│  │                      │  │                      │  │
+│  │ 4. Results           │  │                      │  │
+│  │  9.1M pts  EPSG:32756│  │                      │  │
+│  │  [View] [Photos]     │  │                      │  │
+│  └──────────────────────┘  └──────────────────────┘  │
+└──────────────────────────────────────────────────────┘
+```
+
+## For command-line users
 
 ```bash
 pip install "data2las[gui] @ git+https://github.com/appsbyai/data2las.git"
-```
-
-## Use
-
-**Desktop app** (drag & drop, preview, export):
-```bash
+data2las ./my_flight_data/
 data2las-gui
 ```
 
-**Command line:**
-```bash
-data2las ./my_flight_data/
-data2las . -o cloud.las --min-range 2 --max-range 150
-data2las . --extract-photos
-```
+## Supported
 
-## What it does
+- Rock Robotic R2A (fw 4.2.0.0 tested)
+- Livox Avia LiDAR
+- uBlox ZED-F9P GNSS
+- Works on Windows, macOS, Linux
 
-Drag a folder with `ROCK-*.data` files → click **Process** → get a georeferenced LAS 1.4 file:
+## License
 
-- Extracts GNSS trajectory from uBlox ZED-F9P (standalone or PPK)
-- Decodes Livox Avia LiDAR points (240k pts/sec)
-- Applies boresight + lever arm calibration
-- Outputs UTM-projected LAS with GPS time + intensity
-- Extracts JPEG photos from the camera channel
-- Built-in 3D preview (XY/XZ/YZ projections)
-
-## Supported hardware
-
-| Component | Tested |
-|-----------|--------|
-| ROCK R2A (fw 4.2.0.0) | Yes |
-| Livox Avia | Yes |
-| uBlox ZED-F9P | Yes |
-| Livox Mid-40/100 | Untested |
-| Older firmware versions | Likely works |
-
-## Why
-
-Rock Desktop requires a paid processing license. This tool is MIT-licensed open source — use it anywhere, modify it, share it.
-
-## Build standalone .exe (Windows)
-
-```bash
-pip install pyinstaller
-pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
-```
+MIT — free for everything.

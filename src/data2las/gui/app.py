@@ -15,6 +15,7 @@ from PySide6.QtGui import QAction, QColor, QPalette, QFont
 
 from data2las.engine import Pipeline
 from data2las import utils
+from data2las.ppk import find_base_rinex
 from data2las.gui.worker import ProcessWorker
 from data2las.gui.preview import PointCloudPreview
 from data2las.gui.settings import SettingsDialog
@@ -215,7 +216,15 @@ class MainWindow(QMainWindow):
             if 4 in ch:
                 info += f"LiDAR records: {ch[4]['count']:,}  "
             total_mb = sum(os.path.getsize(f) / 1024 / 1024 for f in dfs)
-            info += f"Total: {total_mb:.0f} MB"
+            info += f"Total: {total_mb:.0f} MB\n"
+
+            # Check for base station RINEX
+            base_obs, base_nav = find_base_rinex(d)
+            if base_obs:
+                info += f"Base: {os.path.basename(base_obs)} (PPK available)"
+            else:
+                info += "Base: none (standalone GNSS, ~0.2m accuracy)"
+
             self._info.setText(info)
             self._in_label.setText("\n".join(os.path.basename(f) for f in dfs))
             self._in_label.setStyleSheet(

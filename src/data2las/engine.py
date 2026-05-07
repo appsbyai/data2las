@@ -9,6 +9,7 @@ from .lidar import decode_points
 from .georef import georeference_points
 from .las_writer import write_las, get_stats
 from .calibration import read_from_pcpp, DEFAULT_LEVER_ARM, DEFAULT_BORESIGHT, DEFAULT_MOUNT_YAW
+from .ppk import find_base_rinex, check_time_overlap, extract_rover_rinex, run_ppk, parse_pos_file
 
 
 class Pipeline:
@@ -51,13 +52,87 @@ class Pipeline:
 
         self.log(f"Lever arm: {lever_arm}  Boresight: {boresight}")
 
-        # Phase 3: GNSS
+        # Phase 3: GNSS (with optional PPK)
         self.progress(10, "Extracting GNSS...")
         gnss = extract_gnss(files["data_files"])
         if not gnss:
             raise ValueError("No valid GNSS positions")
-        self.log(f"GNSS: {len(gnss)} positions, "
-                 f"{(gnss[-1]['t'] - gnss[0]['t'])/1000:.1f}s")
+
+        rover_start = gnss[0]["t"]
+        rover_end = gnss[-1]["t"]
+
+        # Look for base station RINEX
+        base_obs, base_nav = find_base_rinex(input_dir)
+        ppk_used = False
+
+        if base_obs:
+            self.log(f"Base station found: {os.path.basename(base_obs)}")
+            overlaps, bs_start, bs_end = check_time_overlap(
+                rover_start, rover_end, base_obs
+            )
+
+            if overlaps:
+                self.log("Base station time overlaps rover — attempting PPK...")
+
+                # Convert rover UBX to RINEX
+                tmpdir = os.path.join(
+                    os.path.dirname(output_path) or input_dir, ".data2las_tmp"
+                )
+                rover_obs = extract_rover_rinex(
+                    files["data_files"], tmpdir, gnss
+                )
+
+                if rover_obs:
+                    # Run PPK
+                    pos_path = run_ppk(rover_obs, base_obs, base_nav, tmpdir)
+                    if pos_path:
+                        ppk_result = parse_pos_file(pos_path)
+                        if ppk_result:
+                            ppk_times, ppk_lats, ppk_lons, ppk_heights = ppk_result
+                            # Convert to the same format as NAV-PVT
+                            ppk_gnss = [
+                                {
+                                    "t": ppk_times[i],
+                                    "lat": ppk_lats[i],
+                                    "lon": ppk_lons[i],
+                                    "h": ppk_heights[i],
+                                    "fix": 4,
+                                    "sv": 0,
+                                    "h_acc": 0.02,
+                                    "p_dop": 1.0,
+                                    "carr": 2,
+                                    "valid": True,
+                                }
+                                for i in range(len(ppk_times))
+                            ]
+                            gnss = ppk_gnss
+                            ppk_used = True
+                            self.log(
+                                f"PPK: {len(gnss)} fixed positions "
+                                f"(~0.02m accuracy)"
+                            )
+                        else:
+                            self.log("PPK failed: too few fixed solutions")
+                    else:
+                        self.log("PPK failed: rnx2rtkp error (RTKLIB installed?)")
+                else:
+                    self.log("PPK failed: could not extract rover RINEX")
+            else:
+                self.log(
+                    "Base station does not overlap rover time "
+                    f"(base: {bs_start/1000:.0f}-{bs_end/1000:.0f}s, "
+                    f"rover: {rover_start/1000:.0f}-{rover_end/1000:.0f}s)"
+                )
+
+        if not ppk_used:
+            self.log(
+                f"GNSS: {len(gnss)} positions (standalone, "
+                f"~{np.mean([p['h_acc'] for p in gnss]):.2f}m accuracy)"
+            )
+            self.log(
+                "For sub-centimeter accuracy, add base station RINEX files "
+                "and install RTKLIB"
+            )
 
         # Phase 4: LiDAR
         self.progress(20, "Decoding LiDAR...")

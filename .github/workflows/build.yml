@@ -16,8 +16,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -e ".[gui]" && pip install pyinstaller
-      - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
-      - run: ren dist\Data2Las.exe Data2Las-Windows.exe
+      - run: pyinstaller --onefile --windowed --name Data2Las-Windows --paths src --hidden-import data2las --hidden-import data2las.gui --hidden-import data2las.gui.worker --hidden-import data2las.gui.preview --hidden-import data2las.gui.settings run.py
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/Data2Las-Windows.exe
@@ -31,8 +30,7 @@ jobs:
           python-version: '3.12'
       - run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libopengl0
       - run: pip install -e ".[gui]" && pip install pyinstaller
-      - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
-      - run: mv dist/Data2Las dist/Data2Las-Linux
+      - run: pyinstaller --onefile --windowed --name Data2Las-Linux --paths src --hidden-import data2las --hidden-import data2las.gui --hidden-import data2las.gui.worker --hidden-import data2las.gui.preview --hidden-import data2las.gui.settings run.py
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/Data2Las-Linux
@@ -45,8 +43,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -e ".[gui]" && pip install pyinstaller
-      - run: pyinstaller --onefile --windowed --name Data2Las src/data2las/gui/app.py
-      - run: mv dist/Data2Las dist/Data2Las-macOS
+      - run: pyinstaller --onefile --windowed --name Data2Las-macOS --paths src --hidden-import data2las --hidden-import data2las.gui --hidden-import data2las.gui.worker --hidden-import data2las.gui.preview --hidden-import data2las.gui.settings run.py
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/Data2Las-macOS

@@ -15,9 +15,9 @@ from PySide6.QtGui import QAction, QColor, QPalette, QFont
 
 from data2las.engine import Pipeline
 from data2las import utils
-from .worker import ProcessWorker
-from .preview import PointCloudPreview
-from .settings import SettingsDialog
+from data2las.gui.worker import ProcessWorker
+from data2las.gui.preview import PointCloudPreview
+from data2las.gui.settings import SettingsDialog
 
 
 class MainWindow(QMainWindow):
